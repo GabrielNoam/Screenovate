@@ -1,0 +1,7 @@
+<resources>
+    <string name="app_name">Screenovate</string>
+    <string name="incoming_item_feed">Incoming Item Feed</string>
+    <string name="filter_hint">Enter weight to filter</string>
+    <item name="VH" type="id"/>
+    <item name="POS" type="id"/>
+</resources>
