@@ -20,3 +20,8 @@ data class Grocery(@PrimaryKey(autoGenerate = true) var id: Int? = 0,
               @ColumnInfo(name = "bagColor")
               @SerializedName("bagColor")
               var bagColor: String)
+
+fun Grocery.weightAsFloat() =
+    weight.replace("kg","").toFloatOrZero()
+
+

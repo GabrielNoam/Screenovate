@@ -3,18 +3,17 @@ package com.screenovate.superdo
 import android.os.Bundle
 import android.view.animation.AnimationUtils
 import androidx.appcompat.app.AppCompatActivity
+import androidx.databinding.DataBindingUtil
 import androidx.lifecycle.Observer
-import androidx.lifecycle.ViewModelProviders
+import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.google.android.material.snackbar.Snackbar
+import com.screenovate.superdo.databinding.ActivityMainBinding
 import kotlinx.android.synthetic.main.activity_main.*
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
-
-import androidx.databinding.DataBindingUtil
-import com.screenovate.superdo.databinding.ActivityMainBinding
 
 /**
  * MainActivity
@@ -31,29 +30,50 @@ class MainActivity : AppCompatActivity() {
     }
 
     private lateinit var db: GroceriesDatabase
-    private lateinit var data: MutableList<Grocery>
+    private val data: MutableList<Grocery> = mutableListOf()
     private lateinit var viewModel: GroceriesViewModel
     private lateinit var recyclerViewAdapter: GroceriesAdapter
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-
         initBinding()
-        initFromCache()
+        initView()
+        initCache()
+    }
+
+    private fun initObservers() {
+        viewModel.filter.observe(this,
+            Observer<String> {
+
+                val value: Float = it.toFloatOrZero()
+
+                val filter =
+                    { grocery: Grocery ->
+                        value == 0F || grocery.weightAsFloat() < value }
+
+                viewModel.filter(filter)
+
+                Snackbar.make(constraintLayout, "filter $it", Snackbar.LENGTH_SHORT).show()
+            })
+
+        viewModel.groceries.observe(this, observer)
     }
 
     /**
      * Loading last <code>MAX_ITEMS</code> groceries from cache
      */
-    private fun initFromCache() {
+    private fun initCache() {
         GlobalScope.launch(Dispatchers.IO) {
-            // Init database and last data in cache
+            // Init database and latest MAX_ITEMS groceries from cache
             db = GroceriesDatabase.getInstance(this@MainActivity)
-            data = db.groceryDao().loadAll()
+            data.addAll(db.groceryDao().loadAll())
             data.reverse()
+
             withContext(Dispatchers.Main) {
-                // Init views as data prepared
-                initView()
+                recyclerViewAdapter.notifyDataSetChanged()
+
+                // When cache is loaded, start to observe
+                initObservers()
             }
         }
     }
@@ -62,35 +82,27 @@ class MainActivity : AppCompatActivity() {
      * Init Layout and ViewModel binding
      */
     private fun initBinding() {
-        val binding: ActivityMainBinding = DataBindingUtil.setContentView(this, R.layout.activity_main)
-        val viewModel = ViewModelProviders.of(this).get(GroceriesViewModel::class.java)
+        val binding = DataBindingUtil.setContentView<ActivityMainBinding>(this, R.layout.activity_main)
+        viewModel = ViewModelProvider(this).get(GroceriesViewModel::class.java)
         binding.viewModel = viewModel
         lifecycle.addObserver(viewModel)
-
-        viewModel.filter.observe(this,
-            Observer<String> {
-                // TODO Support Generic Filter with hi-order function
-                val value = if(it.isNullOrEmpty()) 0F else it.toFloat()
-                viewModel.filterFeed(value)
-                Snackbar.make(constraintLayout, "filter $it", Snackbar.LENGTH_SHORT).show()
-            })
-
-        setTitle(R.string.incoming_item_feed)
     }
 
+    /**
+     * Views init
+     */
     private fun initView() {
-        recyclerViewAdapter = GroceriesAdapter(data)
+        setTitle(R.string.incoming_item_feed)
 
-        val animation = AnimationUtils.loadLayoutAnimation(this, R.anim.layout_animation_fall_down)
+        recyclerViewAdapter = GroceriesAdapter(data)
 
         recyclerView.apply {
             adapter = recyclerViewAdapter
             layoutManager = LinearLayoutManager(this@MainActivity)
-            layoutAnimation = animation
+            layoutAnimation = AnimationUtils
+                .loadLayoutAnimation(this@MainActivity,
+                    R.anim.layout_animation_fall_down)
         }
-
-        viewModel = ViewModelProviders.of(this).get(GroceriesViewModel::class.java)
-        viewModel.groceries.observe(this, observer)
     }
 
     private val observer =
