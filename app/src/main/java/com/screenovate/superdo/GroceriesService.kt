@@ -21,8 +21,9 @@ class GroceriesService: Service(), Feed<Grocery> {
     private val binder = LocalBinder()
 
     private lateinit var groceryDatabase: GroceriesDatabase
+    private var customWebSocketClient: CustomWebSocketClient? = null
 
-    private val customWebSocketClient = CustomWebSocketClient(
+    private fun getWebSocketClient() = CustomWebSocketClient(
 
         address =  WEB_SOCKET_ADDRESS,
 
@@ -66,25 +67,22 @@ class GroceriesService: Service(), Feed<Grocery> {
         return super.onUnbind(intent)
     }
     override fun onBind(intent: Intent): IBinder {
-        if(!customWebSocketClient.isOpen) {
-            customWebSocketClient.connectionLostTimeout = 1000
-            customWebSocketClient.connect()
-        }
+
         return binder
     }
 
     override fun connect() {
-        GlobalScope.launch(Dispatchers.IO) {
-            if(!customWebSocketClient.isOpen) {
-                customWebSocketClient.reconnect()
-            }
-        }
+        customWebSocketClient = getWebSocketClient()
+        customWebSocketClient?.connect()
     }
 
+
     override fun disconnect() {
-        GlobalScope.launch(Dispatchers.IO) {
-            if (customWebSocketClient.isOpen)
-                customWebSocketClient.close()
+        try {
+            customWebSocketClient?.close()
+        } catch (ex: IllegalStateException) {
+        } finally {
+            customWebSocketClient = null
         }
     }
 
@@ -92,7 +90,7 @@ class GroceriesService: Service(), Feed<Grocery> {
         this.filter = filter
     }
 
-    inner class LocalBinder : Binder() {
-        fun getFeed(): Feed<Grocery> = this@GroceriesService
+    private inner class LocalBinder : Binder(), FeedFactory {
+        override fun <Grocery> getFeed() = this@GroceriesService as Feed<Grocery>
     }
 }

@@ -10,66 +10,21 @@
             type="com.screenovate.superdo.GroceriesViewModel" />
     </data>
 
-    <LinearLayout
+    <androidx.constraintlayout.widget.ConstraintLayout
         android:id="@+id/constraintLayout"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:weightSum="1"
-        android:orientation="vertical"
         tools:context=".MainActivity">
-
-        <com.google.android.material.textfield.TextInputLayout
-            android:id="@+id/textField"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_margin="@dimen/buttons_margin"
-            android:hint="@string/filter_hint"
-            android:inputType="numberDecimal" >
-
-            <com.google.android.material.textfield.TextInputEditText
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:text="@={viewModel.filter}"
-                android:inputType="numberDecimal" />
-
-        </com.google.android.material.textfield.TextInputLayout>
 
         <androidx.recyclerview.widget.RecyclerView
             android:id="@+id/recyclerView"
             android:layout_width="match_parent"
-            android:layout_height="0dp"
-            android:layout_weight="1"
-            android:layoutAnimation="@anim/layout_animation_fall_down" />
-
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:orientation="horizontal"
-            android:weightSum="2">
-
-            <com.google.android.material.button.MaterialButton
-                android:layout_margin="@dimen/buttons_margin"
-                android:layout_width="0dp"
-                android:layout_weight="1"
-                android:layout_height="wrap_content"
-                android:onClick="@{() -> viewModel.stop()}"
-                android:text="@string/stop_feed"
-                app:strokeColor="@color/mtrl_text_btn_text_color_selector"
-                style="@style/Widget.MaterialComponents.Button.OutlinedButton"/>
-
-
-            <com.google.android.material.button.MaterialButton
-                android:layout_margin="@dimen/buttons_margin"
-                android:layout_width="0dp"
-                android:layout_weight="1"
-                android:layout_height="wrap_content"
-                android:onClick="@{() -> viewModel.start()}"
-                android:text="@string/resume_feed"
-                app:strokeColor="@color/mtrl_text_btn_text_color_selector"
-                style="@style/Widget.MaterialComponents.Button.OutlinedButton" />
-
-        </LinearLayout>
-
-    </LinearLayout>
+            android:layout_height="match_parent"
+            android:text="TextView"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
+    </androidx.constraintlayout.widget.ConstraintLayout>
 
 </layout>

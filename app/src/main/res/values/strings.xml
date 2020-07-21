@@ -2,6 +2,16 @@
     <string name="app_name">Screenovate</string>
     <string name="incoming_item_feed">Incoming Item Feed</string>
     <string name="filter_hint">Enter weight to filter</string>
-    <string name="stop_feed">Stop</string>
-    <string name="resume_feed">Resume</string>
+    <string name="stop_feed">Stop feed</string>
+    <string name="error_feed">Feed error</string>
+    <string name="cached_feed">Cached feed is loaded</string>
+    <string name="start_feed">Start feed</string>
+    <string name="filter_under">Filter under %f</string>
+    <string name="no_filter">No filter</string>
+    <string name="exceed_max_items">Exceeded %d items, clear list ...</string>
+    <string name="network_reconnected">Internet is back, feed is reconnected</string>
+    <string name="network_disconnected">Internet is lost feed is disconnected</string>
+    <string name="click_to_stop_feed">Click to stop feed</string>
+    <string name="click_to_start_feed">Click to start feed</string>
+    <string name="click_to_filter_feed">Click to filter feed</string>
 </resources>
